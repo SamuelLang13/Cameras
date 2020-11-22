@@ -223,6 +223,7 @@ typedef struct Cameras{
 //function for reading the parameters of camera/s
 CAMERA *readCamera(int *n)
 {
+    int i=0;
     CAMERA *data=NULL;
     int max=0;
     int cameraID;
@@ -233,13 +234,159 @@ CAMERA *readCamera(int *n)
     int min;
     int input;
     int isDayGood=0;
-    int isFirst=1;
-    int isLast=0;
+    //int isFirst=1;
+    //int isLast=0;
+    //char lastChar[1000];
+    char x;
+    char tmp;
     //int sizeOfMonth=0;
 
     *n=0;
-
-    while ((input=scanf("%d: %1000s %5s %d %d:%2d",&cameraID,RZ,month,&day,&hour,&min)==6)!=EOF)
+    if((input=scanf("{%d: %1000s %5s %d %d:%2d%1c",&cameraID,RZ,month,&day,&hour,&min,&x)==7))
+    {
+        if(x!=',' && x!='}')
+        {
+            free(data);
+            return NULL;
+        }
+        else if(x==',')
+        {
+            while ((input=scanf("%d: %1000s %5s %d %d:%2d%1c",&cameraID,RZ,month,&day,&hour,&min,&x)==7)!=EOF)
+            {
+                if(x!=',')
+                {
+                    printf("VSTUP\n");
+                    free(data);
+                    return NULL;                    
+                }
+                if(*n>=max)
+                {
+                    if(max<1000)
+                    {
+                        max=max+500;
+                    }
+                    else
+                    {
+                        max=max+100;
+                    }
+                    data=(CAMERA*)realloc(data,max*sizeof(*data));
+                }
+                //checking if the first literal is capital
+                if(month[0]>='a' && month[0]<='z')
+                {
+                    return 0;
+                }
+                isDayGood=months(month,day);
+                if(isDayGood==0)
+                {
+                    return 0;
+                }
+                if(hour>23 || hour<0 || min>59 || min<0)
+                {
+                    return 0;            
+                }
+                //function for checking if the day is good
+                isDayGood=months(month,day);
+                strncpy(data[*n].s_RZ,RZ,sizeof(data[*n].s_RZ));
+                strncpy(data[*n].s_month,month,sizeof(data[*n].s_month));
+                data[*n].s_cameraID=cameraID;
+                data[*n].s_day=day;
+                data[*n].s_hour=hour;
+                data[*n].s_min=min;
+                ++*n;
+                tmp=x;   
+            }
+            if(x=='}' && input!=EOF)
+            {   
+                if(*n>=max)
+                {
+                    if(max<1000)
+                    {
+                        max=max+500;
+                    }
+                    else
+                    {
+                        max=max+100;
+                    }
+                    data=(CAMERA*)realloc(data,max*sizeof(*data));
+                }
+                //checking if the first literal is capital
+                if(month[0]>='a' && month[0]<='z')
+                {
+                    return 0;
+                }
+                isDayGood=months(month,day);
+                if(isDayGood==0)
+                {
+                    return 0;
+                }
+                if(hour>23 || hour<0 || min>59 || min<0)
+                {
+                    return 0;            
+                }
+                //function for checking if the day is good
+                isDayGood=months(month,day);
+                strncpy(data[*n].s_RZ,RZ,sizeof(data[*n].s_RZ));
+                strncpy(data[*n].s_month,month,sizeof(data[*n].s_month));
+                data[*n].s_cameraID=cameraID;
+                data[*n].s_day=day;
+                data[*n].s_hour=hour;
+                data[*n].s_min=min;
+                ++*n;                    
+            }
+            else if(input !=EOF)
+            {
+                free(data);
+                return NULL;
+            }                   
+        }
+        else if(x=='}')
+        {
+           if(*n>=max)
+            {
+                if(max<1000)
+                {
+                    max=max+500;
+                }
+                else
+                {
+                    max=max+100;
+                }
+                data=(CAMERA*)realloc(data,max*sizeof(*data));
+            }
+            //checking if the first literal is capital
+            if(month[0]>='a' && month[0]<='z')
+            {
+                return 0;
+            }
+            isDayGood=months(month,day);
+            if(isDayGood==0)
+            {
+                return 0;
+            }
+            if(hour>23 || hour<0 || min>59 || min<0)
+            {
+                return 0;            
+            }
+            //function for checking if the day is good
+            isDayGood=months(month,day);
+            strncpy(data[*n].s_RZ,RZ,sizeof(data[*n].s_RZ));
+            strncpy(data[*n].s_month,month,sizeof(data[*n].s_month));
+            data[*n].s_cameraID=cameraID;
+            data[*n].s_day=day;
+            data[*n].s_hour=hour;
+            data[*n].s_min=min;
+            ++*n;           
+        }
+        
+    }
+    else
+    {
+        free(data);
+        return NULL;
+    }
+    printf("Hledani:\n");
+    while ((input=scanf("%d: %1000s %5s %d %d:%2d",&cameraID,RZ,month,&day,&hour,&min)==7)!=EOF)
     {
         //sizeOfMonth=sizeof(month)/sizeof(month[0]);
         //reallocating the size of they array
@@ -253,9 +400,7 @@ CAMERA *readCamera(int *n)
             {
                 max=max+100;
             }
-
             data=(CAMERA*)realloc(data,max*sizeof(*data));
-            
         }
         //checking if the first literal is capital
         if(month[0]>='a' && month[0]<='z')
@@ -272,7 +417,6 @@ CAMERA *readCamera(int *n)
         {
             return 0;            
         }
-        //printf("OK MONTH\n");
         //function for checking if the day is good
         isDayGood=months(month,day);
         strncpy(data[*n].s_RZ,RZ,sizeof(data[*n].s_RZ));
@@ -282,14 +426,15 @@ CAMERA *readCamera(int *n)
         data[*n].s_hour=hour;
         data[*n].s_min=min;
         ++*n;
-    }
-    //The format is not good
-    if(input !=EOF)
-    {
-        free(data);
-        return NULL;
-    }
-    return data;
+        i++;
+        }
+        //The format is not good
+        if(input !=EOF)
+        {
+            free(data);
+            return NULL;
+        }    
+return data;
 }
 
 int main(void)
